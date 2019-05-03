@@ -9,7 +9,7 @@ add_executable(app
 )
 target_link_libraries(app
     ${OPENGL_LIBRARIES} # open gl libs already linked by gl3w, linking again ...
-    gl3w
+	glad
     glfw
 )
 target_include_directories(app PUBLIC

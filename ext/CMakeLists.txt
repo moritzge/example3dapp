@@ -1,4 +1,4 @@
-add_subdirectory(gl3w)
+add_subdirectory(glad)
 set( GLFW_BUILD_EXAMPLES OFF CACHE BOOL  "GLFW lib only" )
 set( GLFW_BUILD_TESTS OFF CACHE BOOL  "GLFW lib only" )
 set( GLFW_BUILD_DOCS OFF CACHE BOOL  "GLFW lib only" )
