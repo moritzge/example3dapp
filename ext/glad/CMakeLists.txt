@@ -9,7 +9,7 @@ add_library(glad STATIC
 )
 
 target_include_directories(glad PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
+	${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(glad 

@@ -17,8 +17,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 800;
+unsigned int SCR_HEIGHT = 600;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -32,6 +32,9 @@ float lastFrame = 0.0f;
 
 // lighting
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
+glm::vec3 modelTrans(0, 0, 0);
+glm::vec3 modelRot(0, 0, 0);
 
 int main()
 {
@@ -56,8 +59,10 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+	// glfw callbacks
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
@@ -153,7 +158,6 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -188,6 +192,10 @@ int main()
 
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, modelRot[0], glm::vec3(1, 0, 0));
+		model = glm::rotate(model, modelRot[1], glm::vec3(0, 1, 0));
+		model = glm::rotate(model, modelRot[2], glm::vec3(0, 0, 1));
+		model = glm::translate(model, modelTrans);
         lightingShader.setMat4("model", model);
 
         // render the cube
@@ -241,6 +249,32 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+
+	// TODO: put this in the model class
+	if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)){
+		if(glfwGetKey(window, GLFW_KEY_L))
+			modelRot += glm::vec3(deltaTime, 0, 0);
+		if(glfwGetKey(window, GLFW_KEY_J))
+			modelRot -= glm::vec3(deltaTime, 0, 0);
+		if(glfwGetKey(window, GLFW_KEY_I))
+			modelRot += glm::vec3(0, deltaTime, 0);
+		if(glfwGetKey(window, GLFW_KEY_K))
+			modelRot -= glm::vec3(0, deltaTime, 0);
+		if(glfwGetKey(window, GLFW_KEY_U))
+			modelRot += glm::vec3(0, 0, deltaTime);
+		if(glfwGetKey(window, GLFW_KEY_O))
+			modelRot -= glm::vec3(0, 0, deltaTime);
+	}
+	else {
+		if(glfwGetKey(window, GLFW_KEY_L))
+			modelTrans += glm::vec3(deltaTime, 0, 0);
+		if(glfwGetKey(window, GLFW_KEY_J))
+			modelTrans -= glm::vec3(deltaTime, 0, 0);
+		if(glfwGetKey(window, GLFW_KEY_I))
+			modelTrans += glm::vec3(0, deltaTime, 0);
+		if(glfwGetKey(window, GLFW_KEY_K))
+			modelTrans -= glm::vec3(0, deltaTime, 0);
+	}
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -250,8 +284,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
-}
 
+	SCR_WIDTH = width;
+	SCR_HEIGHT = height;
+}
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
