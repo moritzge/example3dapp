@@ -2,6 +2,9 @@
 # Todo
 
 ## OpenGL stuff
+- [ ] use Model::loadModel
+- [ ] include assimp via submodule (now have to do apt install libassimp-dev)
+- [ ] render two cubes
 - [ ] integrate model class
 - [ ] make a BaseApp class (do we want that? see below)
 - [ ] make a "CAD" camera
@@ -11,7 +14,7 @@
 
 ## Other
 - [ ] get code from comp-fab exercises and merge
-
+- [ ] use st_image to load textures (see commented code in model.h)
 
 # Resources
 
@@ -43,5 +46,6 @@ option 2:
     + load objs
     + click objs, translate and rotate meshes
     + group meshes to models
+    + see model and meshes in ImGui
 - robot model viewer, and motion plan playback
     + read rbs! maybe converter to new json format?

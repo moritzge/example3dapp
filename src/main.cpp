@@ -8,6 +8,8 @@
 // #include <filesystem.h>
 #include <shader_m.h> 
 #include <camera.h>
+#include <mesh.h>
+#include <model.h>
 
 #include <iostream>
 

@@ -4,6 +4,9 @@ project(gui)
 
 find_package(OpenGL REQUIRED)
 
+find_package(ASSIMP REQUIRED)
+message(STATUS "Found ASSIMP in ${ASSIMP_INCLUDE_DIR}")
+
 file(GLOB sources
 	${CMAKE_CURRENT_SOURCE_DIR}/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
