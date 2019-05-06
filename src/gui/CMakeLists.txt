@@ -12,6 +12,7 @@ target_link_libraries(gui
     ${OPENGL_LIBRARIES} # open gl libs already linked by gl3w, linking again ...
 	glad
     glfw
+    glm
 )
 target_include_directories(gui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
