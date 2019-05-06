@@ -1,7 +1,9 @@
 
 # Todo
-- [ ] make a first 3d app
+- [ ] make glm a submodule
 - [ ] get code from comp-fab exercises and merge
+
+- [x] make a first 3d app
 
 # Resources
 
