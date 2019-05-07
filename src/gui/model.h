@@ -30,6 +30,8 @@ public:
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
+	glm::mat4 trafo = glm::mat4(1.f);
+	glm::vec3 color = {0.31f, 0.5f, 1.f};
 
     /*  Functions   */
     // constructor, expects a filepath to a 3D model.

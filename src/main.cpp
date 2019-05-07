@@ -27,7 +27,7 @@ unsigned int SCR_WIDTH = 1600;
 unsigned int SCR_HEIGHT = 1200;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 10.f, 30.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -197,7 +197,7 @@ int main()
 //	ImGui::StyleColorsDark();
 //	ImGui::StyleColorsLight();
 	Style();
-	ImFont *imFont = io.Fonts->AddFontFromFileTTF(IMGUI_FONT_FOLDER"/Roboto-Medium.ttf", 20.0f);
+	ImFont *imFont = io.Fonts->AddFontFromFileTTF(IMGUI_FONT_FOLDER"/Roboto-Medium.ttf", 15.0f);
 
 
     // configure global opengl state
@@ -283,8 +283,12 @@ int main()
     glEnableVertexAttribArray(0);
 
 	std::vector<Model> models;
-	Model m(DATA_FOLDER"/nanosuit.obj");
-	models.push_back(m);
+	Model m0(DATA_FOLDER"/nanosuit.obj");
+	models.push_back(m0);
+	Model m1(DATA_FOLDER"/nanosuit.obj");
+	m1.trafo = glm::translate(m1.trafo, {10.f, 0.f, 0.f});
+	m1.color = {1.f, 0.5f, 0.31f};
+	models.push_back(m1);
 
     // render loop
     // -----------
@@ -302,7 +306,8 @@ int main()
 
 		// render
 		// ------
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+//		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// be sure to activate shader when setting uniforms/drawing objects
@@ -319,15 +324,10 @@ int main()
 		lightingShader.setVec3("lightPos", lightPos);
 		lightingShader.setVec3("viewPos", camera.Position);
 
-		// world transformation
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, modelRot[0], glm::vec3(1, 0, 0));
-		model = glm::rotate(model, modelRot[1], glm::vec3(0, 1, 0));
-		model = glm::rotate(model, modelRot[2], glm::vec3(0, 0, 1));
-		model = glm::translate(model, modelTrans);
-		lightingShader.setMat4("model", model);
-
 		for (const auto & m : models) {
+			// world transformation
+			lightingShader.setMat4("model", m.trafo);
+			lightingShader.setVec3("objectColor", m.color);
 			m.Draw(lightingShader);
 		}
 
@@ -359,6 +359,7 @@ int main()
 
 		int counterModels = 0;
 		for( const auto &model : models ){
+			ImGui::PushID(counterModels);
 			if(ImGui::TreeNode("Model", "Model %d", counterModels)){
 				ImGui::LabelText("dir", "%s", model.directory.c_str());
 
@@ -380,6 +381,7 @@ int main()
 				}
 				ImGui::TreePop();
 			}
+			ImGui::PopID();
 			counterModels++;
 		}
 
