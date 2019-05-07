@@ -14,3 +14,4 @@ target_link_libraries(${PROJECT_NAME}
 
 set(SHADER_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/gui/shaders\"")
 target_compile_definitions(${PROJECT_NAME} PRIVATE SHADER_FOLDER=${SHADER_FOLDER})
+target_compile_definitions(${PROJECT_NAME} PRIVATE DATA_FOLDER=${DATA_FOLDER})

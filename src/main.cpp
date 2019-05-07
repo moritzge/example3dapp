@@ -24,7 +24,7 @@ unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
 
 // camera
-CameraDrag camera(glm::vec3(0.0f, 0.0f, 3.0f));
+CameraDrag camera(glm::vec3(0.0f, 0.0f, -3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -55,7 +55,7 @@ int main()
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-    if (window == NULL)
+	if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -161,6 +161,8 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+	Model rockModel(DATA_FOLDER"/nanosuit.obj");
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -202,9 +204,10 @@ int main()
 		model = glm::translate(model, modelTrans);
         lightingShader.setMat4("model", model);
 
+		rockModel.Draw(lightingShader);
         // render the cube
         glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+//		glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // also draw the lamp object
         lampShader.use();
@@ -217,7 +220,6 @@ int main()
 
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -296,19 +298,25 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
-		if (firstMouse)
-		{
-			lastX = xpos;
-			lastY = ypos;
-			firstMouse = false;
-		}
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
 
+	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){\
 		float xoffset = xpos - lastX;
 		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-		camera.ProcessMouseMovement(xoffset, yoffset);
+		camera.ProcessLeftMouseMovement(xoffset, yoffset);
 	}
+	else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS){\
+		float xoffset = xpos - lastX;
+		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+		camera.ProcessMiddleMouseMovement(xoffset, yoffset);
+	}
+
+
 
 	lastX = xpos;
 	lastY = ypos;

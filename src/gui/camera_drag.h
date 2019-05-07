@@ -37,7 +37,7 @@ public:
         WorldUp = up;
         Yaw = yaw;
         Pitch = pitch;
-		Front = glm::vec3(1, 0, 0);
+		Front = glm::vec3(0, 0, 1);
 		Right = glm::vec3(0, 1, 0);
         updateCameraVectors();
 	 }
@@ -56,7 +56,7 @@ public:
     {
 
 		matCam = glm::identity<glm::mat4>();
-		matCam = glm::translate(matCam, -Position);
+		matCam = glm::translate(matCam, Position);
 		matCam = glm::rotate(matCam, glm::radians(Yaw), glm::vec3(0, 1, 0));
 		matCam = glm::rotate(matCam, glm::radians(Pitch), glm::vec3(0, 0, 1));
 
@@ -78,26 +78,26 @@ public:
     }
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
+	void ProcessLeftMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
     {
-        xoffset *= MouseSensitivity;
-        yoffset *= MouseSensitivity;
+		xoffset *= MouseSensitivity*MouseSensitivity;
+		yoffset *= MouseSensitivity*MouseSensitivity;
 
-		Yaw   += xoffset;
-		Pitch += yoffset;
-
-        // Make sure that when pitch is out of bounds, screen doesn't get flipped
-//        if (constrainPitch)
-//        {
-//            if (Pitch > 89.0f)
-//                Pitch = 89.0f;
-//            if (Pitch < -89.0f)
-//                Pitch = -89.0f;
-//        }
+		Position -= glm::vec3(xoffset, yoffset, 0);
 
         // Update Front, Right and Up Vectors using the updated Euler angles
         updateCameraVectors();
     }
+
+	void ProcessMiddleMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
+	{
+		xoffset *= MouseSensitivity;
+		yoffset *= MouseSensitivity;
+
+		Yaw   += xoffset;
+		Pitch += yoffset;
+		updateCameraVectors();
+	}
 
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(float yoffset)
