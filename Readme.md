@@ -3,6 +3,9 @@
 
 ## OpenGL stuff
 
+- [ ] clean up a bit
+- [ ] load objs by button, remove models
+- [ ] easy way to draw sphere/cube/arrow/...
 - [ ] make a CAD camera
 - [ ] include assimp via submodule (now have to do apt install libassimp-dev)
 - [ ] make a BaseApp class (do we want that? see below)
