@@ -20,11 +20,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // settings
-unsigned int SCR_WIDTH = 800;
-unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 1600;
+unsigned int SCR_HEIGHT = 1200;
 
 // camera
-CameraDrag camera(glm::vec3(0.0f, 0.0f, -3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -209,17 +209,17 @@ int main()
         glBindVertexArray(cubeVAO);
 //		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // also draw the lamp object
-        lampShader.use();
-        lampShader.setMat4("projection", projection);
-        lampShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lampShader.setMat4("model", model);
+//        // also draw the lamp object
+//        lampShader.use();
+//        lampShader.setMat4("projection", projection);
+//		lampShader.setMat4("view", view);
+//		model = glm::mat4(1.0f);
+//		model = glm::translate(model, lightPos);
+//		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+//        lampShader.setMat4("model", model);
 
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+//        glBindVertexArray(lightVAO);
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -308,13 +308,13 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){\
 		float xoffset = xpos - lastX;
 		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-		camera.ProcessLeftMouseMovement(xoffset, yoffset);
+		camera.ProcessMouseMovement(xoffset, yoffset);
 	}
-	else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS){\
-		float xoffset = xpos - lastX;
-		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-		camera.ProcessMiddleMouseMovement(xoffset, yoffset);
-	}
+//	else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS){\
+//		float xoffset = xpos - lastX;
+//		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+//		camera.ProcessMiddleMouseMovement(xoffset, yoffset);
+//	}
 
 
 

@@ -83,7 +83,7 @@ public:
 		xoffset *= MouseSensitivity*MouseSensitivity;
 		yoffset *= MouseSensitivity*MouseSensitivity;
 
-		Position -= glm::vec3(xoffset, yoffset, 0);
+		Position += glm::vec3(xoffset, yoffset, 0);
 
         // Update Front, Right and Up Vectors using the updated Euler angles
         updateCameraVectors();
@@ -96,6 +96,7 @@ public:
 
 		Yaw   += xoffset;
 		Pitch += yoffset;
+
 		updateCameraVectors();
 	}
 
