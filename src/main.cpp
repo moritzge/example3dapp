@@ -1,5 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include "imgui_impl/imgui_impl_glfw.h"
+#include "imgui_impl/imgui_impl_opengl3.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -78,6 +81,29 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+	// Setup Dear ImGui binding
+	float pixelRatio = 1.0f;
+	const char* glsl_version = "#version 130";
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.ScaleAllSizes(pixelRatio);
+	ImFontConfig cfg;
+	cfg.SizePixels = 13 * pixelRatio;
+	ImGui::GetIO().Fonts->AddFontDefault(&cfg)->DisplayOffset.y = pixelRatio;
+
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(glsl_version);
+
+	// Setup style
+//	ImGui::StyleColorsDark();
+	ImGui::StyleColorsLight();
 
     // configure global opengl state
     // -----------------------------
@@ -161,7 +187,9 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-	Model rockModel(DATA_FOLDER"/nanosuit.obj");
+	std::vector<Model> models;
+	Model m(DATA_FOLDER"/nanosuit.obj");
+	models.push_back(m);
 
     // render loop
     // -----------
@@ -204,7 +232,10 @@ int main()
 		model = glm::translate(model, modelTrans);
         lightingShader.setMat4("model", model);
 
-		rockModel.Draw(lightingShader);
+		for (const auto & m : models) {
+			m.Draw(lightingShader);
+		}
+
         // render the cube
         glBindVertexArray(cubeVAO);
 //		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -221,6 +252,49 @@ int main()
 //        glBindVertexArray(lightVAO);
 //        glDrawArrays(GL_TRIANGLES, 0, 36);
 
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+
+		ImGui::NewFrame();
+		ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Once);
+		ImGui::Begin("Hello Imgui");
+		ImGui::Button("Hi!");
+
+		int counterModels = 0;
+		for( const auto &model : models ){
+			if(ImGui::TreeNode("Model", "Model %d", counterModels)){
+				ImGui::LabelText("dir", "%s", model.directory.c_str());
+
+				if(ImGui::TreeNode("Meshes")){
+					ImGui::LabelText("meshes", "%zu", model.meshes.size());
+					int counterMeshes = 0;
+					for(const auto &mesh : model.meshes){
+						ImGui::PushID(counterMeshes);
+						if(ImGui::TreeNode("Mesh", "Mesh %d", counterMeshes)){
+							ImGui::LabelText("vertices", "%zu", mesh.vertices.size());
+							ImGui::LabelText("indices", "%zu", mesh.indices.size());
+							ImGui::LabelText("textures", "%zu", mesh.textures.size());
+							ImGui::TreePop();
+						}
+						ImGui::PopID();
+						counterMeshes++;
+					}
+					ImGui::TreePop();
+				}
+				ImGui::TreePop();
+			}
+			counterModels++;
+		}
+
+		ImGui::End();
+		ImGui::EndFrame();
+
+		// Rendering
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -235,6 +309,12 @@ int main()
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
+
+	// Cleanup
+	ImGui_ImplGlfw_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui::DestroyContext();
+
     glfwTerminate();
     return 0;
 }
@@ -298,6 +378,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	if(ImGui::GetIO().WantCaptureMouse)
+		return;
+
 	if (firstMouse)
 	{
 		lastX = xpos;

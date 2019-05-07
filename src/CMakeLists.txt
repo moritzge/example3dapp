@@ -4,7 +4,10 @@ project(app)
 
 add_subdirectory(gui)
 
-file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.h ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+file(GLOB sources
+	${CMAKE_CURRENT_SOURCE_DIR}/*.h
+	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+	)
 add_executable(${PROJECT_NAME}
     ${sources}
 )
