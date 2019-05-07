@@ -2,13 +2,15 @@
 # Todo
 
 ## OpenGL stuff
-- [ ] use Model::loadModel
+- [ ] integrate imgui
+
+- [ ] make a CAD camera
 - [ ] include assimp via submodule (now have to do apt install libassimp-dev)
-- [ ] render two cubes
-- [ ] integrate model class
 - [ ] make a BaseApp class (do we want that? see below)
 - [ ] make a "CAD" camera
 
+- [x] integrate model class
+- [x] use Model::loadModel
 - [x] make glm a submodule
 - [x] make a first 3d app
 
