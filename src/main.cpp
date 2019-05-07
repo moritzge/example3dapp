@@ -42,6 +42,8 @@ glm::vec3 lightPos(2.f, 1.0f, 2.0f);
 glm::vec3 modelTrans(0, 0, 0);
 glm::vec3 modelRot(0, 0, 0);
 
+int selectedModel = -1;
+
 void Style()
 {
 	ImGuiStyle & style = ImGui::GetStyle();
@@ -175,29 +177,31 @@ int main()
     }
 
 	// Setup Dear ImGui binding
-	float pixelRatio = 1.0f;
+	float pixelRatio = 2.0f;
 	const char* glsl_version = "#version 130";
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
+	Style();
+	ImFontConfig cfg;
+	cfg.SizePixels = 40 * pixelRatio;
+	ImFont *imFont = io.Fonts->AddFontFromFileTTF(IMGUI_FONT_FOLDER"/Roboto-Medium.ttf", 15.0f * pixelRatio, &cfg);
+	imFont->DisplayOffset.y = pixelRatio;
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.ScaleAllSizes(pixelRatio);
-	ImFontConfig cfg;
-	cfg.SizePixels = 13 * pixelRatio;
-	ImGui::GetIO().Fonts->AddFontDefault(&cfg)->DisplayOffset.y = pixelRatio;
+
+//	ImGui::GetIO().Fonts->AddFont(&cfg);// (imFont->ConfigData)->DisplayOffset.y = pixelRatio;
+//	imFont->ConfigData->SizePixels = 13 * pixelRatio;
+	// Setup style
+//	ImGui::StyleColorsDark();
+//	ImGui::StyleColorsLight();
 
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
-
-	// Setup style
-//	ImGui::StyleColorsDark();
-//	ImGui::StyleColorsLight();
-	Style();
-	ImFont *imFont = io.Fonts->AddFontFromFileTTF(IMGUI_FONT_FOLDER"/Roboto-Medium.ttf", 15.0f);
 
 
     // configure global opengl state
@@ -324,11 +328,18 @@ int main()
 		lightingShader.setVec3("lightPos", lightPos);
 		lightingShader.setVec3("viewPos", camera.Position);
 
-		for (const auto & m : models) {
-			// world transformation
-			lightingShader.setMat4("model", m.trafo);
-			lightingShader.setVec3("objectColor", m.color);
-			m.Draw(lightingShader);
+		{
+			int counterModels = 0;
+			for (const auto & m : models) {
+				// world transformation
+				lightingShader.setMat4("model", m.trafo);
+				if(counterModels == selectedModel)
+					lightingShader.setVec3("objectColor", {0.5f, 1.5f, 0.31f});
+				else
+					lightingShader.setVec3("objectColor", m.color);
+				m.Draw(lightingShader);
+				counterModels++;
+			}
 		}
 
         // render the cube
@@ -351,7 +362,6 @@ int main()
 		ImGui_ImplGlfw_NewFrame();
 
 		ImGui::NewFrame();
-		ImGui::PushFont(imFont);
 
 		ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Once);
 		ImGui::Begin("Hello Imgui");
@@ -360,7 +370,16 @@ int main()
 		int counterModels = 0;
 		for( const auto &model : models ){
 			ImGui::PushID(counterModels);
+			if(selectedModel == counterModels){
+				ImVec2 p_min = ImGui::GetCursorScreenPos();
+				ImVec2 p_max = ImVec2(p_min.x + ImGui::GetContentRegionAvailWidth(), p_min.y + ImGui::GetTextLineHeight());
+				ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, IM_COL32(100,100,200,200));
+			}
 			if(ImGui::TreeNode("Model", "Model %d", counterModels)){
+				bool isSelected = (selectedModel == counterModels);
+				if(ImGui::Checkbox("selected", &isSelected))
+					selectedModel = (isSelected) ? counterModels : -1;
+
 				ImGui::LabelText("dir", "%s", model.directory.c_str());
 
 				if(ImGui::TreeNode("Meshes")){
@@ -385,7 +404,6 @@ int main()
 			counterModels++;
 		}
 
-		ImGui::PopFont();
 		ImGui::End();
 		ImGui::EndFrame();
 
