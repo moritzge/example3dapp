@@ -23,6 +23,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+//void drop_callback(GLFWwindow* window, int count, const char **filenames);
 void processInput(GLFWwindow *window);
 
 // settings
@@ -46,6 +47,9 @@ glm::vec3 modelTrans(0, 0, 0);
 glm::vec3 modelRot(0, 0, 0);
 
 int selectedModel = -1;
+
+std::vector<Model> models;
+
 
 void Style()
 {
@@ -302,13 +306,18 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-	std::vector<Model> models;
 	Model m0(DATA_FOLDER"/nanosuit.obj");
 	models.push_back(m0);
 	Model m1(DATA_FOLDER"/nanosuit.obj");
 	m1.trafo = glm::translate(m1.trafo, {10.f, 0.f, 0.f});
 	m1.color = {1.f, 0.5f, 0.31f};
 	models.push_back(m1);
+
+	glfwSetDropCallback(window, [](GLFWwindow *window, int count, const char **filenames){
+		for (int i = 0; i < count; ++i) {
+			models.push_back(Model(filenames[i]));
+		}
+	});
 
     // render loop
     // -----------
@@ -384,7 +393,7 @@ int main()
 		ImGui::Button("Hi!");
 
 		int counterModels = 0;
-		for( const auto &model : models ){
+		for( auto &model : models ){
 			ImGui::PushID(counterModels);
 			if(selectedModel == counterModels){
 				ImVec2 p_min = ImGui::GetCursorScreenPos();
@@ -395,6 +404,10 @@ int main()
 				bool isSelected = (selectedModel == counterModels);
 				if(ImGui::Checkbox("selected", &isSelected))
 					selectedModel = (isSelected) ? counterModels : -1;
+				if(ImGui::Button("Delete")){
+					models.erase(models.begin() + counterModels);
+					continue;
+				}
 
 				ImGui::LabelText("dir", "%s", model.directory.c_str());
 
@@ -412,6 +425,16 @@ int main()
 						ImGui::PopID();
 						counterMeshes++;
 					}
+					ImGui::TreePop();
+				}
+				if(ImGui::TreeNode("Transformation")){
+					ImGui::PushItemWidth(40);
+					ImGui::InputFloat("x", &model.trafo[3][0]);
+					ImGui::SameLine();
+					ImGui::InputFloat("y", &model.trafo[3][1]);
+					ImGui::SameLine();
+					ImGui::InputFloat("z", &model.trafo[3][2]);
+					ImGui::PopItemWidth();
 					ImGui::TreePop();
 				}
 				ImGui::TreePop();
