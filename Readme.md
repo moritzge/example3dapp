@@ -30,6 +30,13 @@ https://github.com/Polytonic/Glitter
 
 # Thoughts 
 
+## main goals of scpv2 / why scpv2?
+- fast compilation times
+- better repo management (e.g. base repo + one repo per project)
+- clean code dependencies
+- use modern OpenGL
+- ... what else?
+
 ## about BaseApp class
 option 1: 
     make a BaseApp class, or rather a 2d and 3d version of it.
