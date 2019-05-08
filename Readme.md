@@ -3,13 +3,13 @@
 
 ## OpenGL stuff
 
-- [ ] clean up a bit
-- [ ] load objs by button, remove models
-- [ ] easy way to draw sphere/cube/arrow/...
-- [ ] make a CAD camera
-- [ ] include assimp via submodule (now have to do apt install libassimp-dev)
 - [ ] make a BaseApp class (do we want that? see below)
+- [ ] matcap shader (bmp per mesh, see old scp)
+- [ ] load objs by button, remove models
+- [ ] easy way to draw point/line/sphere/cube/arrow/...
+- [ ] include assimp via submodule (now have to do apt install libassimp-dev)
 
+- [x] make a CAD camera, or use old scp cam
 - [x] integrate imgui
 - [x] integrate model class
 - [x] use Model::loadModel

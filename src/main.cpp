@@ -31,7 +31,7 @@ unsigned int SCR_WIDTH = 1600;
 unsigned int SCR_HEIGHT = 1200;
 
 // camera
-Camera camera(glm::vec3(0.0f, 10.f, 30.0f));
+CameraTracking camera;//(/*glm::vec3(0.0f, 10.f, 30.0f)*/);
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -173,16 +173,6 @@ int main()
     }
     glfwMakeContextCurrent(window);
 
-	// glfw callbacks
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-	glfwSetDropCallback(window, [](GLFWwindow *window, int count, const char **filenames){
-		for (int i = 0; i < count; ++i) {
-			models.push_back(Model(filenames[i]));
-		}
-	});
-
 	// app icon
 	GLFWimage image;
 	image.pixels = stbi_load(DATA_FOLDER"/crl_icon.png", &image.width, &image.height, nullptr, 4);
@@ -215,6 +205,23 @@ int main()
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
+
+	// glfw callbacks
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset){
+		if(ImGui::GetIO().WantCaptureMouse){
+			ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+			return;
+		}
+
+		camera.ProcessMouseScroll(yoffset);
+	});
+	glfwSetDropCallback(window, [](GLFWwindow *window, int count, const char **filenames){
+		for (int i = 0; i < count; ++i) {
+			models.push_back(Model(filenames[i]));
+		}
+	});
 
 	// configure global opengl state
 	glEnable(GL_DEPTH_TEST);
@@ -261,7 +268,7 @@ int main()
 			lightingShader.use();
 
 			// view/projection transformations
-			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
 			glm::mat4 view = camera.GetViewMatrix();
 			lightingShader.setMat4("projection", projection);
 			lightingShader.setMat4("view", view);
@@ -269,7 +276,7 @@ int main()
 			lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 			lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 			lightingShader.setVec3("lightPos", lightPos);
-			lightingShader.setVec3("viewPos", camera.Position);
+			lightingShader.setVec3("viewPos", camera.position());
 			int counterModels = 0;
 			for (const auto & m : models) {
 				// world transformation
@@ -316,6 +323,8 @@ int main()
 					// delete model
 					if(ImGui::Button("Delete")){
 						models.erase(models.begin() + counterModels);
+						TreePop();
+						PopID();
 						continue;
 					}
 
@@ -331,11 +340,13 @@ int main()
 								ImGui::LabelText("vertices", "%zu", mesh.vertices.size());
 								ImGui::LabelText("indices", "%zu", mesh.indices.size());
 								ImGui::LabelText("textures", "%zu", mesh.textures.size());
+
 								ImGui::TreePop();
 							}
 							ImGui::PopID();
 							counterMeshes++;
 						}
+
 						ImGui::TreePop();
 					}
 
@@ -349,6 +360,7 @@ int main()
 							ImGui::InputFloat("y", &model.trafo[3][1]);
 							ImGui::SameLine();
 							ImGui::InputFloat("z", &model.trafo[3][2]);
+
 							ImGui::TreePop();
 						}
 
@@ -358,15 +370,14 @@ int main()
 							if(ImGui::InputFloat("x", &model.trafo[0][0])){
 								model.trafo[1][1] = model.trafo[2][2] = model.trafo[0][0];
 							}
-//							ImGui::SameLine();
-//							ImGui::InputFloat("y", &model.trafo[1][1]);
-//							ImGui::SameLine();
-//							ImGui::InputFloat("z", &model.trafo[2][2]);
+
 							ImGui::TreePop();
 						}
 						ImGui::PopItemWidth();
+
 						ImGui::TreePop();
 					}
+
 					ImGui::TreePop();
 				}
 				ImGui::PopID();
@@ -454,8 +465,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // glfw: whenever the mouse moves, this callback is called
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	if(ImGui::GetIO().WantCaptureMouse)
-		return;
+//	if(ImGui::GetIO().WantCaptureMouse)
+//		ImGui_ImplGlfw_(window, xoffset, yoffset);
 
 	if (firstMouse)
 	{
@@ -467,22 +478,16 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){\
 		float xoffset = xpos - lastX;
 		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-		camera.ProcessMouseMovement(xoffset, yoffset);
+		camera.ProcessLeftMouseMovement(xoffset, yoffset);
 	}
-//	else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS){\
-//		float xoffset = xpos - lastX;
-//		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-//		camera.ProcessMiddleMouseMovement(xoffset, yoffset);
-//	}
+	else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS){\
+		float xoffset = xpos - lastX;
+		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+		camera.ProcessMiddleMouseMovement(xoffset, yoffset);
+	}
 
 
 
 	lastX = xpos;
 	lastY = ypos;
-}
-
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    camera.ProcessMouseScroll(yoffset);
 }
