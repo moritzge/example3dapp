@@ -17,3 +17,6 @@ target_include_directories(glm INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURC
 # imgui
 add_subdirectory(imgui)
 set( IMGUI_FONT_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/imgui/misc/fonts\"" CACHE STRING "")
+
+# stb_image
+add_subdirectory(stb_image)

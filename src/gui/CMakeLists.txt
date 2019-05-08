@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(gui)
 
-find_package(OpenGL REQUIRED)
+#find_package(OpenGL REQUIRED)
 
 find_package(ASSIMP REQUIRED)
 message(STATUS "Found ASSIMP in ${ASSIMP_INCLUDE_DIR}")
@@ -24,6 +24,7 @@ target_link_libraries(${PROJECT_NAME}
 	glm
 	assimp
 	imgui
+	stb_image
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}

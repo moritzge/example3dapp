@@ -4,6 +4,9 @@
 #include "imgui_impl/imgui_impl_glfw.h"
 #include "imgui_impl/imgui_impl_opengl3.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -159,7 +162,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "example app", NULL, NULL);
 	if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -173,8 +176,13 @@ int main()
 	glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    // tell GLFW to capture our mouse
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	GLFWimage image;
+	image.pixels = stbi_load(DATA_FOLDER"/crl_icon.png", &image.width, &image.height, nullptr, 4);
+	glfwSetWindowIcon(window, 1, &image);
+	stbi_image_free(image.pixels);
+
+	// tell GLFW to capture our mouse
+//	 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
