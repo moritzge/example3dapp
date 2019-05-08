@@ -217,7 +217,7 @@ int main()
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 	// configure global opengl state
-    glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 	// build and compile our shader program
 	Shader lightingShader(SHADER_FOLDER"/2.2.basic_lighting.vs", SHADER_FOLDER"/2.2.basic_lighting.fs");
@@ -227,10 +227,18 @@ int main()
 	{
 		Model m0(DATA_FOLDER"/nanosuit.obj");
 		models.push_back(m0);
-		Model m1(DATA_FOLDER"/nanosuit.obj");
-		m1.trafo = glm::translate(m1.trafo, {10.f, 0.f, 0.f});
+
+		Model m1(DATA_FOLDER"/lego.obj");
+		m1.trafo = glm::translate(m1.trafo, {5.f, 0.f, 0.f});
 		m1.color = {1.f, 0.5f, 0.31f};
+		m1.trafo = glm::scale(m1.trafo, glm::vec3(0.2f));
 		models.push_back(m1);
+
+		Model m2(DATA_FOLDER"/robot.obj");
+		m2.trafo = glm::translate(m2.trafo, glm::vec3(-10, 0, 0));
+		m2.trafo = glm::scale(m2.trafo, glm::vec3(0.03f));
+		m2.color = {0.3f, 0.3f, 0.3f};
+		models.push_back(m2);
 	}
 
 	// render loop
@@ -277,6 +285,8 @@ int main()
 
 		// draw ImGui
 		{
+			using namespace ImGui;
+
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 
@@ -332,11 +342,28 @@ int main()
 					// show and allow edit of model trafo
 					if(ImGui::TreeNode("Transformation")){
 						ImGui::PushItemWidth(40);
-						ImGui::InputFloat("x", &model.trafo[3][0]);
-						ImGui::SameLine();
-						ImGui::InputFloat("y", &model.trafo[3][1]);
-						ImGui::SameLine();
-						ImGui::InputFloat("z", &model.trafo[3][2]);
+
+						if(ImGui::TreeNode("position")){
+							ImGui::InputFloat("x", &model.trafo[3][0]);
+							ImGui::SameLine();
+							ImGui::InputFloat("y", &model.trafo[3][1]);
+							ImGui::SameLine();
+							ImGui::InputFloat("z", &model.trafo[3][2]);
+							ImGui::TreePop();
+						}
+
+						if(ImGui::TreeNode("size")){
+//							float size = model.trafo[0][0]
+
+							if(ImGui::InputFloat("x", &model.trafo[0][0])){
+								model.trafo[1][1] = model.trafo[2][2] = model.trafo[0][0];
+							}
+//							ImGui::SameLine();
+//							ImGui::InputFloat("y", &model.trafo[1][1]);
+//							ImGui::SameLine();
+//							ImGui::InputFloat("z", &model.trafo[2][2]);
+							ImGui::TreePop();
+						}
 						ImGui::PopItemWidth();
 						ImGui::TreePop();
 					}
