@@ -136,6 +136,14 @@ void Style()
 	#endif
 }
 
+inline float get_pixep_ratio() {
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	if(monitor == nullptr) throw "Primary monitor not found.";
+	float xscale, yscale;
+	glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+	return xscale;
+}
+
 int main()
 {
     // glfw: initialize and configure
@@ -177,7 +185,7 @@ int main()
     }
 
 	// Setup Dear ImGui binding
-	float pixelRatio = 2.0f;
+	float pixelRatio = get_pixep_ratio();
 	const char* glsl_version = "#version 130";
 
 	IMGUI_CHECKVERSION();
